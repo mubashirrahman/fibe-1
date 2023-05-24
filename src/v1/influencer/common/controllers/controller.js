@@ -192,6 +192,80 @@ module.exports = {
     }
   },
   setSocialmedia: async (req, res) => {
+    const user = await services.getUserById(influencer, req.query.id);
+    console.log(user)
+    if (user != null) {
+      await influencer.updateOne({ _id: req.query.id }, { $set: req.body }).then((response) => {
+        res.status(statusCodes.success).json({
+          status: true,
+          message: messages.updatedSuccessfully,
+          data: response
+        })
+      }).catch((err) => {
+        const error = err.toString();
+        res.status(statusCodes.internalServerError).json({
+          status: false,
+          message: messages.internalServerError,
+          error: error
+        })
+      })
+    } else {
+      res.status(statusCodes.notFound).json({
+        status: false,
+        message: messages.userNotFound
+      });
+    }
+
+  },
+
+  changeCity: async (req, res) => {
+    const user = await services.getUserById(influencer, req.query.id);
+    if (user != null) {
+      await influencer.updateOne({ _id: req.query.id }, { $set:{city:req.body.city}}).then((response) => {
+        res.status(statusCodes.success).json({
+          status: true,
+          message: messages.updatedSuccessfully,
+          data: response
+        })
+      }).catch((err) => {
+        const error = err.toString();
+        res.status(statusCodes.internalServerError).json({
+          status: false,
+          message: messages.internalServerError,
+          error: error
+        })
+      })
+    } else {
+      res.status(statusCodes.notFound).json({
+        status: false,
+        message: messages.userNotFound
+      });
+    }
+
+  },
+  setViewcount: async (req, res) => {
+    const user = await services.getUserById(influencer, req.query.id);
+    if (user != null) {
+      await influencer.updateOne({ _id: req.query.id },{ $set: {viewCount:req.body.viewCount}}).then((response) => {
+        res.status(statusCodes.success).json({
+          status: true,
+          message: messages.updatedSuccessfully,
+          data: response
+        })
+      }).catch((err) => {
+        const error = err.toString();
+        res.status(statusCodes.internalServerError).json({
+          status: false,
+          message: messages.internalServerError,
+          error: error
+        })
+      })
+    } else {
+      res.status(statusCodes.notFound).json({
+        status: false,
+        message: messages.userNotFound
+      });
+    }
 
   }
 };
