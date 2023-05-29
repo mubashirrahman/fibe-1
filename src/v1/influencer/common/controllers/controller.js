@@ -24,7 +24,7 @@ module.exports = {
     })
   },
   getInfluencer: async (req, res) => {
-    const user = await services.getUserById(influencer, req.query.id);
+    const user = await services.getUserById(influencer, req.params.id);
     if (user != null) {
       try {
         res.status(statusCodes.success).json({

@@ -3,7 +3,7 @@ const controller = require('../controllers/controller');
 const services = require('../../../services/services');
 
 router.route('/').get(controller.listInfluencers);
-router.route('/get').get(controller.getInfluencer)
+router.route('/:id').get(controller.getInfluencer)
 router.route('/signup').post(controller.signUp);
 router.route('/generateotp').post(controller.generateOtp);
 router.route('/login').post(controller.verifyOtp);
