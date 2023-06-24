@@ -236,31 +236,45 @@ module.exports = {
   },
 
   addBrandDesc: async (req, res) => {
-    let description = {
-      campaignPin: req.body.campaignPin,
-      category: req.body.category,
-      description: req.body.description,
-
-      // assuming the description file was uploaded as a single file with name 'descriptionField1'
-    }
-    if (req.files.file) {
-      description.file = req.files.file[0].path;
-    }
-
-    await brand.updateOne({ _id: req.query.id }, { $set: { description: description } }, { runValidators: true }).then((response) => {
-      res.status(statusCodes.success).json({
-        status: true,
-        message: messages.updatedSuccessfully,
-        data: response
-      })
-    }).catch((err) => {
-      const error = err.toString();
-      res.status(statusCodes.internalServerError).json({
+    const response = await brand.findOne({ _id: req.query.id });
+    if (response == null) {
+      res.status(statusCodes.notFound).json({
         status: false,
-        message: messages.internalServerError,
-        error: error
+        error: statusCodes.notFound,
+        message: messages.itemNotFount,
+      });
+    }
+    else {
+
+      let description = {
+        campaignPin: req.body.campaignPin,
+        category: req.body.category,
+        description: req.body.description,
+
+        // assuming the description file was uploaded as a single file with name 'descriptionField1'
+      }
+      try {
+
+        if (req.files.file) {
+          description.file = req.files.file[0].path;
+        }
+      } catch { }
+
+      await brand.updateOne({ _id: req.query.id }, { $set: { description: description } }, { runValidators: true }).then((response) => {
+        res.status(statusCodes.success).json({
+          status: true,
+          message: messages.updatedSuccessfully,
+          data: response
+        })
+      }).catch((err) => {
+        const error = err.toString();
+        res.status(statusCodes.internalServerError).json({
+          status: false,
+          message: messages.internalServerError,
+          error: error
+        })
       })
-    })
+    }
 
   },
 
