@@ -8,7 +8,7 @@ const messages = require("../../../others/messages/messages");
 
 module.exports = {
   listInfluencers: async (req, res) => {
-    await influencer.find().then((response) => {
+    await influencer.find({}, { iID: 1, phone: 1, name: { $concat: ["$firstName", " ", "$lastName"] }, email: 1, country: 1, city: 1 }).then((response) => {
       res.status(statusCodes.success).json({
         status: true,
         data: response,
@@ -134,7 +134,7 @@ module.exports = {
   },
   updateProfile: async (req, res) => {
     const user = await services.getUserById(influencer, req.query.id);
-    console.log(user)
+    //console.log(user)
     if (user != null) {
       await influencer.updateOne({ _id: req.query.id }, { $set: req.body }).then((response) => {
         res.status(statusCodes.success).json({
@@ -221,7 +221,8 @@ module.exports = {
   changeCity: async (req, res) => {
     const user = await services.getUserById(influencer, req.query.id);
     if (user != null) {
-      await influencer.updateOne({ _id: req.query.id }, { $set:{city:req.body.city}}).then((response) => {
+      let city = req.body.city || '';
+      await influencer.updateOne({ _id: req.query.id }, { $set: { city: city } }, { runValidators: true }).then((response) => {
         res.status(statusCodes.success).json({
           status: true,
           message: messages.updatedSuccessfully,
@@ -238,7 +239,7 @@ module.exports = {
     } else {
       res.status(statusCodes.notFound).json({
         status: false,
-        message: messages.userNotFound
+        message: messages.userNotFound,
       });
     }
 
@@ -246,7 +247,8 @@ module.exports = {
   setViewcount: async (req, res) => {
     const user = await services.getUserById(influencer, req.query.id);
     if (user != null) {
-      await influencer.updateOne({ _id: req.query.id },{ $set: {viewCount:req.body.viewCount}}).then((response) => {
+      let viewCount = req.body.viewCount || null;
+      await influencer.updateOne({ _id: req.query.id }, { $set: { viewCount: viewCount } }, { runValidators: true }).then((response) => {
         res.status(statusCodes.success).json({
           status: true,
           message: messages.updatedSuccessfully,
@@ -263,9 +265,34 @@ module.exports = {
     } else {
       res.status(statusCodes.notFound).json({
         status: false,
-        message: messages.userNotFound
+        message: messages.userNotFound,
       });
     }
 
+  },
+  setStatus: async (req, res) => {
+    const user = await services.getUserById(influencer, req.query.id);
+    if (user != null) {
+      let status = req.body.status || '';
+      await influencer.updateOne({ _id: req.query.id }, { $set: { status: status } }, { runValidators: true }).then((response) => {
+        res.status(statusCodes.success).json({
+          status: true,
+          message: messages.updatedSuccessfully,
+          data: response
+        })
+      }).catch((err) => {
+        const error = err.toString();
+        res.status(statusCodes.internalServerError).json({
+          status: false,
+          message: messages.internalServerError,
+          error: error
+        })
+      })
+    } else {
+      res.status(statusCodes.notFound).json({
+        status: false,
+        message: messages.userNotFound,
+      });
+    }
   }
 };

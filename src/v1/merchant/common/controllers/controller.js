@@ -144,6 +144,8 @@ module.exports = {
       })
     }
   },
+
+
   addBrand: async (req, res) => {
     // console.log('request is' , req.file)
     // console.log('files are' , Object.keys(req.files));
@@ -152,7 +154,8 @@ module.exports = {
     // console.log('logo and file', logo , file);
     const Brand = new brand({
       basic_Information: {
-        logo: req.files.logo[0].path, // assuming the logo file was uploaded as a single file with name 'logo'
+        logo: req.files.logo[0].path,
+        // assuming the logo file was uploaded as a single file with name 'logo'
         instagram: req.body.instagram,
         orderLink: req.body.orderLink,
         deliveryZone: req.body.deliveryZone
@@ -168,13 +171,116 @@ module.exports = {
         campaignPin: req.body.campaignPin,
         category: req.body.category,
         description: req.body.description,
-        file: req.files.file[0].path // assuming the description file was uploaded as a single file with name 'descriptionField1'
+        // file:req.files.file[0].path 
+        // assuming the description file was uploaded as a single file with name 'descriptionField1'
       },
       mID: req.body.mID
     });
 
     await services.validateRequestAndCreate(req, res, Brand);
   },
+
+  addBasicBrand: async (req, res) => {
+    let basic_Information = {
+      instagram: req.body.instagram,
+      orderLink: req.body.orderLink,
+      deliveryZone: req.body.deliveryZone
+    }
+    try {
+      if (req.files.logo) {
+        basic_Information.logo = req.files.logo[0].path;
+      }
+    }
+    catch { }
+    const Brand = new brand({
+      basic_Information,
+      mID: req.body.mID
+    })
+    await services.validateRequestAndCreate(req, res, Brand);
+  },
+
+  addBrandBranch: async (req, res) => {
+
+    const response = await brand.findOne({ _id: req.query.id });
+    if (response != null) {
+      res.status(statusCodes.notFound).json({
+        status: false,
+        error: statusCodes.notFound,
+        message: messages.itemNotFount,
+      });
+    }
+    else {
+      const branch_Information = {
+        branchName: req.body.branchName,
+        contactName: req.body.contactName,
+        contactNumber: req.body.contactNumber,
+        country: req.body.country,
+        location: req.body.location
+      }
+
+      await brand.find({ _id: req.query.id }, { $set: { branch_Information: branch_Information } }, { runValidators: true }).then((response) => {
+        res.status(statusCodes.success).json({
+          status: true,
+          message: messages.updatedSuccessfully,
+          data: response
+        })
+      }).catch((err) => {
+        const error = err.toString();
+        res.status(statusCodes.internalServerError).json({
+          status: false,
+          message: messages.internalServerError,
+          error: error
+        })
+      })
+    }
+  },
+
+  addBrandDesc: async (req, res) => {
+    let description = {
+      campaignPin: req.body.campaignPin,
+      category: req.body.category,
+      description: req.body.description,
+
+      // assuming the description file was uploaded as a single file with name 'descriptionField1'
+    }
+    if (req.files.file) {
+      description.file = req.files.file[0].path;
+    }
+
+    await brand.updateOne({ _id: req.query.id }, { $set: { description: description } }, { runValidators: true }).then((response) => {
+      res.status(statusCodes.success).json({
+        status: true,
+        message: messages.updatedSuccessfully,
+        data: response
+      })
+    }).catch((err) => {
+      const error = err.toString();
+      res.status(statusCodes.internalServerError).json({
+        status: false,
+        message: messages.internalServerError,
+        error: error
+      })
+    })
+
+  },
+
+  listBrands: async (req, res) => {
+    await brand.find().then((response) => {
+      res.status(statusCodes.success).json({
+        status: true,
+        data: response,
+        message: response ? messages.itemNotFount : "successfully showed brand items"
+      });
+    }).catch((err) => {
+      const error = err.toString();
+      res.status(statusCodes.internalServerError).json({
+        status: false,
+        error: error,
+        message: messages.internalServerError
+      });
+    })
+  },
+
 
   addCampaign: async (req, res) => {
     const Campaign = new campaign({

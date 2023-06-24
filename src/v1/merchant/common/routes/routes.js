@@ -38,7 +38,13 @@ router.route('/login').post(controller.login);
 router.route('/update').patch(services.verifyMerchantToken ,controller.updateProfile);
 router.route('/logout').patch(services.verifyMerchantToken ,controller.logOut);
 router.route('/delete').delete(services.verifyMerchantToken ,controller.deleteAccount);
-router.route('/add/brand').post(services.verifyMerchantToken ,upload.fields([{ name: 'logo', maxCount: 1 }, { name: 'file', maxCount: 1 }]),controller.addBrand);
+
+
+router.route('/brand/basic').post(upload.fields([{ name: 'logo', maxCount: 1 }]),controller.addBasicBrand);
+router.route('/brand/branch/').post(controller.addBrandBranch);
+router.route('/brand/description').post(upload.fields([{ name: 'file', maxCount: 1 }]),controller.addBrandDesc);
+router.route('/brands').get(controller.listBrands)
+
 router.route('/add/campaign').post(services.verifyMerchantToken ,upload.fields([{ name: 'campaignImages', maxCount: 4 }, { name: 'coverImage', maxCount: 1 }]),controller.addCampaign);
 router.route('/add/staff').post(services.verifyMerchantToken ,controller.addStaff);
 router.route('/add/submerchant').post(services.verifyMerchantToken ,controller.addSubMerchant);

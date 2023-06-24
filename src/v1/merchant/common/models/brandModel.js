@@ -10,7 +10,7 @@ const fileSchema = new Schema({
 const basicSchema = new Schema({
     logo : {
         type : String,
-        required: true
+        //required: true
     },
     instagram : {
         type : String ,
@@ -61,7 +61,7 @@ const descriptionSchema = new Schema({
     } ,
     file : {
         type : String, 
-        required : true
+        // required : true
     }
 }) ;
 
@@ -71,12 +71,10 @@ const brandSchema = new Schema({
         required :true
     },
     branch_Information : {
-        type : branchSchema ,
-        required : true
+        type : branchSchema
     } ,
     description : {
-        type : descriptionSchema, 
-        required : true
+        type : descriptionSchema
     } ,
     mID : {
         type : String ,

@@ -59,6 +59,11 @@ const influencerSchema = new Schema({
     viewCount: {
         type: Number
     },
+    status: {
+        type: String,
+        default:"Active",
+        required:true
+    },
     socialLinks: socialSchema
 }, { timestamps: true });
 

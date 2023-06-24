@@ -9,6 +9,7 @@ module.exports = {
     loggOutSuccess: "Logged out Succesfully",
     unauthorized: "unauthorized or invalid user",
     userNotFound:'No user found',
+    itemNotFount:"relevent item not found",
     updatedSuccessfully: 'Updated successfully',
     userDeleted: 'Account deleted succesfully',
     passwordError : 'Invalid email or password',

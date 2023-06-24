@@ -126,8 +126,13 @@ verifyMerchantToken : async (req, res, next) => {
       })
   } , 
   getUserById : async (model , id) =>{
-    const response = await model.findOne({_id : id});
-    return response
+    try {
+      const response = await model.findOne({_id : id});
+      return response
+    }
+    catch {
+      return null
+    }
   } , 
   
 };
