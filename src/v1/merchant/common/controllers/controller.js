@@ -202,7 +202,7 @@ module.exports = {
   addBrandBranch: async (req, res) => {
 
     const response = await brand.findOne({ _id: req.query.id });
-    if (response != null) {
+    if (response == null) {
       res.status(statusCodes.notFound).json({
         status: false,
         error: statusCodes.notFound,
@@ -218,7 +218,7 @@ module.exports = {
         location: req.body.location
       }
 
-      await brand.find({ _id: req.query.id }, { $set: { branch_Information: branch_Information } }, { runValidators: true }).then((response) => {
+      await brand.updateOne({ _id: req.query.id }, { $set: { branch_Information: branch_Information } }, { runValidators: true }).then((response) => {
         res.status(statusCodes.success).json({
           status: true,
           message: messages.updatedSuccessfully,
