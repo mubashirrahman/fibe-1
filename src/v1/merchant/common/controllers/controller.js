@@ -7,7 +7,6 @@ const { v4: uuidv4 } = require('uuid');
 const statusCodes = require("../../../others/statuscodes/statuscode");
 const messages = require("../../../others/messages/messages");
 const { merchant, brand, campaign, staff, submerchant } = require('../models/model');
-
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
@@ -182,6 +181,7 @@ module.exports = {
 
   addBasicBrand: async (req, res) => {
     let basic_Information = {
+      brandName: req.body.brandName,
       instagram: req.body.instagram,
       orderLink: req.body.orderLink,
       deliveryZone: req.body.deliveryZone

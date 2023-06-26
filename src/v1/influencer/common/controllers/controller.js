@@ -75,10 +75,11 @@ module.exports = {
         message: "No account linked to this mobile number",
       });
     } else {
-      let Otp = "0000"
+      let Otp = await services.generateOtp();
+      console.log(otp)
       var unhashedOtp = Otp;
       const salt = await bcrypt.genSalt(10);
-      //  Otp = await bcrypt.hash(Otp , salt);
+      Otp = await bcrypt.hash(Otp , salt);
       const credential = new otp({ phone: req.body.phone, otp: Otp });
       await credential.save().then(async (response) => {
         await services.sendSms(req.body.phone, unhashedOtp);
