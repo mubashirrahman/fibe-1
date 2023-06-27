@@ -350,7 +350,7 @@ module.exports = {
       res.status(statusCodes.success).json({
         status: true,
         data: response,
-        message: response ? "successfully showed brand items":messages.itemNotFount
+        message: response ? "successfully showed campaign items":messages.itemNotFount
       });
     }).catch((err) => {
       const error = err.toString();
@@ -368,7 +368,7 @@ module.exports = {
       res.status(statusCodes.success).json({
         status: true,
         data: response,
-        message: response.length ? "showed user brands" : messages.itemNotFount
+        message: response.length ? "showed user campaign" : messages.itemNotFount
       });
     }).catch((err) => {
       const error = err.toString();
