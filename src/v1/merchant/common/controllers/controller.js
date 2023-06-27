@@ -275,7 +275,7 @@ module.exports = {
       res.status(statusCodes.success).json({
         status: true,
         data: response,
-        message: response ? messages.itemNotFount : "successfully showed brand items"
+        message: response ? "successfully showed brand items" : messages.itemNotFount
       });
     }).catch((err) => {
       const error = err.toString();
