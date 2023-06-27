@@ -44,9 +44,19 @@ router.route('/brand/basic').post(upload.fields([{ name: 'logo', maxCount: 1 }])
 router.route('/brand/branch/').post(controller.addBrandBranch);
 router.route('/brand/description').post(upload.fields([{ name: 'file', maxCount: 1 }]),controller.addBrandDesc);
 router.route('/brands').get(controller.listBrands)
+router.route('/brands/user/').get(controller.listBrandsByUser)
 
 router.route('/add/campaign').post(services.verifyMerchantToken ,upload.fields([{ name: 'campaignImages', maxCount: 4 }, { name: 'coverImage', maxCount: 1 }]),controller.addCampaign);
-router.route('/add/staff').post(services.verifyMerchantToken ,controller.addStaff);
+router.route('/campaign/basic').post(controller.addBasicCampaign);
+router.route('/campaign/photoDescription').post(upload.fields([{ name: 'campaignImages', maxCount: 4 }, { name: 'coverImage', maxCount: 1 }]),controller.addCampaignPhotoDesc);
+router.route('/campaign/details').post(controller.addCampaignDetails);
+router.route('/campaign/settings').post(controller.addCampaignSettings);
+router.route('/campaign').get(controller.listCampaign)
+router.route('/campaign/user/').get(controller.listCampaignByUser)
+
+router.route('/staff').post(controller.addStaff);
+
+
 router.route('/add/submerchant').post(services.verifyMerchantToken ,controller.addSubMerchant);
 router.route('/get/details').get(controller.getAllDetails);
 // router.post('/add/brand/', upload.fields([{name : 'logo', maxCount : 1} , {name : 'file', maxCount : 1}] , controller.addBrand))

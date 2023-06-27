@@ -8,13 +8,14 @@ const basicSchema = new Schema({
     } , 
     title : {
         type : String ,
-        required : true
+        required : true,
+        unique:true
     } ,
-    branch : {
-        type : String ,
-        required : true
-    } , 
-    type : {
+    // branch : {
+    //     type : String ,
+    //     required : true
+    // } , 
+    deliveryType : {
         type : String , 
         required : true
     } , 
@@ -63,26 +64,10 @@ const detailsSchema = new Schema({
     excludedDays : {
         type : Array , 
         required : true
-    } ,
-    startTime : {
-        type : String ,
-        required : true
-    } ,
-    endTime : {
-        type : String ,
-        required : true
-    } 
+    }
 });
 
 const settingsSchema = new Schema({
-    branch : {
-        type : String ,
-        required : true
-    } ,
-    chat : {
-        type : Boolean ,
-        required : true
-    } ,
     whatsappName : {
         type : String ,
         required :  true
@@ -111,16 +96,13 @@ const campaignSchema = new Schema({
         required : true
     } ,
     photosAndDescription : {
-        type : photoSchema , 
-        required : true
+        type : photoSchema 
     } ,
     details : {
-        type : detailsSchema ,
-        required : true
+        type : detailsSchema 
     } , 
     settings : {
-        type : settingsSchema ,
-        required : true
+        type : settingsSchema
     } ,
     mID: {
         type : String ,
