@@ -2,6 +2,8 @@ const router = require('express').Router();
 const controller = require('../controllers/controller');
 const services = require('../../../services/services')
 const multer = require('multer');
+const brandController = require('../controllers/brandController');
+const campaignController = require('../controllers/campaignController');
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -40,19 +42,19 @@ router.route('/logout').patch(services.verifyMerchantToken ,controller.logOut);
 router.route('/delete').delete(services.verifyMerchantToken ,controller.deleteAccount);
 
 
-router.route('/brand/basic').post(upload.fields([{ name: 'logo', maxCount: 1 }]),controller.addBasicBrand);
-router.route('/brand/branch/').post(controller.addBrandBranch);
-router.route('/brand/description').post(upload.fields([{ name: 'file', maxCount: 1 }]),controller.addBrandDesc);
-router.route('/brands').get(controller.listBrands)
-router.route('/brands/user/').get(controller.listBrandsByUser)
+router.route('/brand/basic').post(upload.fields([{ name: 'logo', maxCount: 1 }]),brandController.addBasicBrand);
+router.route('/brand/branch/').post(brandController.addBrandBranch);
+router.route('/brand/description').post(upload.fields([{ name: 'file', maxCount: 1 }]),brandController.addBrandDesc);
+router.route('/brands').get(brandController.listBrands)
+router.route('/brands/user/').get(brandController.listBrandsByUser)
 
 router.route('/add/campaign').post(services.verifyMerchantToken ,upload.fields([{ name: 'campaignImages', maxCount: 4 }, { name: 'coverImage', maxCount: 1 }]),controller.addCampaign);
-router.route('/campaign/basic').post(controller.addBasicCampaign);
-router.route('/campaign/photoDescription').post(upload.fields([{ name: 'campaignImages', maxCount: 4 }, { name: 'coverImage', maxCount: 1 }]),controller.addCampaignPhotoDesc);
-router.route('/campaign/details').post(controller.addCampaignDetails);
-router.route('/campaign/settings').post(controller.addCampaignSettings);
-router.route('/campaign').get(controller.listCampaign)
-router.route('/campaign/user/').get(controller.listCampaignByUser)
+router.route('/campaign/basic').post(campaignController.addBasicCampaign);
+router.route('/campaign/photoDescription').post(upload.fields([{ name: 'campaignImages', maxCount: 4 }, { name: 'coverImage', maxCount: 1 }]),campaignController.addCampaignPhotoDesc);
+router.route('/campaign/details').post(campaignController.addCampaignDetails);
+router.route('/campaign/settings').post(campaignController.addCampaignSettings);
+router.route('/campaign').get(campaignController.listCampaign)
+router.route('/campaign/user/').get(campaignController.listCampaignByUser)
 
 router.route('/staff').post(controller.addStaff);
 
