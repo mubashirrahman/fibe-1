@@ -41,8 +41,8 @@ module.exports = {
         message: messages.alreadyExists,
       });
     } else {
-      //   const salt = await bcrypt.genSalt(10);
-      //   req.body.password = await bcrypt.hash(req.body.password , salt);
+        const salt = await bcrypt.genSalt(10);
+        req.body.password = await bcrypt.hash(req.body.password , salt);
       req.body.mID = uuidv4();
       const user = new merchant(req.body);
       services.validateRequestAndCreate(req, res, user);
@@ -60,7 +60,7 @@ module.exports = {
           message: messages.userNotFound
         });
       } else {
-        const valid = await bcrypt.compare(req.body.password, response.password);
+        const valid = await bcrypt.compare(req.body.password,response.password);
         if (valid) {
           const token = await services.generateToken(response);
           await merchant.updateOne({ email: req.body.email }, { token: token });
