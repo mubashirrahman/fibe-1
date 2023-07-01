@@ -8,6 +8,7 @@ const statusCodes = require("../../../others/statuscodes/statuscode");
 const messages = require("../../../others/messages/messages");
 const { merchant, brand, campaign, staff, submerchant } = require('../models/model');
 const { ObjectId } = require('mongodb');
+const { use } = require('../routes/routes');
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
@@ -30,6 +31,37 @@ const upload = multer({
 
 
 module.exports = {
+  getMerchant: async (req, res) => {
+    const user = await services.getUserById(merchant, req.params.id);
+    if (user != null) {
+      try {
+        res.status(statusCodes.success).json({
+          status: true,
+          data: {
+            "name": user.name,
+            "email": user.email,
+            "company": user.company,
+            "contact": user.contact,
+            "mID": user.mID
+          }
+
+        })
+      }
+      catch (err) {
+        const error = err.toString();
+        res.status(statusCodes.internalServerError).json({
+          status: false,
+          message: messages.internalServerError,
+          error: error
+        })
+      }
+    } else {
+      res.status(statusCodes.notFound).json({
+        status: false,
+        message: messages.userNotFound
+      });
+    }
+  },
   signUp: async (req, res) => {
     console.log(req.body);
     req.body.token = ''
@@ -41,8 +73,8 @@ module.exports = {
         message: messages.alreadyExists,
       });
     } else {
-        const salt = await bcrypt.genSalt(10);
-        req.body.password = await bcrypt.hash(req.body.password , salt);
+      const salt = await bcrypt.genSalt(10);
+      req.body.password = await bcrypt.hash(req.body.password, salt);
       req.body.mID = uuidv4();
       const user = new merchant(req.body);
       services.validateRequestAndCreate(req, res, user);
@@ -60,7 +92,7 @@ module.exports = {
           message: messages.userNotFound
         });
       } else {
-        const valid = await bcrypt.compare(req.body.password,response.password);
+        const valid = await bcrypt.compare(req.body.password, response.password);
         if (valid) {
           const token = await services.generateToken(response);
           await merchant.updateOne({ email: req.body.email }, { token: token });
@@ -87,9 +119,11 @@ module.exports = {
     }
   },
   updateProfile: async (req, res) => {
+    console.log(req)
     const user = await services.getUserById(merchant, req.query.id);
-    console.log(user)
     if (user != null) {
+      const salt = await bcrypt.genSalt(10);
+      req.body.password = await bcrypt.hash(req.body.password, salt);
       await merchant.updateOne({ _id: req.query.id }, { $set: req.body }).then((response) => {
         res.status(statusCodes.success).json({
           status: true,
@@ -246,6 +280,7 @@ module.exports = {
       });
     }
   },
+
   getAllDetails: async (req, res) => {
     console.log('mID', req.query.mID);
     await merchant.aggregate([

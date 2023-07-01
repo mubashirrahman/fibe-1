@@ -34,7 +34,7 @@ const upload = multer({
     },
     fileFilter: fileFilter
   });
-
+router.route('/:id').get(controller.getMerchant);
 router.route('/signup').post(controller.signUp);
 router.route('/login').post(controller.login);
 router.route('/update').patch(services.verifyMerchantToken ,controller.updateProfile);
