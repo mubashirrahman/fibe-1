@@ -94,7 +94,7 @@ module.exports = {
       } else {
         const valid = await bcrypt.compare(req.body.password, response.password);
         if (valid) {
-          const token = await services.generateToken(response);
+          const token = await services.generateToken(response.email);
           await merchant.updateOne({ email: req.body.email }, { token: token });
           res.status(statusCodes.success).json({
             status: true,
