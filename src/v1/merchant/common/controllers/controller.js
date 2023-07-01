@@ -99,6 +99,7 @@ module.exports = {
           res.status(statusCodes.success).json({
             status: true,
             message: messages.updatedSuccessfully,
+            user_ID :response._id,
             mid: response.mID,
             token: token
           });
