@@ -76,17 +76,21 @@ module.exports = {
       });
     } else {
       let Otp = await services.generateOtp();
-      console.log(otp)
+      console.log(Otp)
       var unhashedOtp = Otp;
       const salt = await bcrypt.genSalt(10);
       Otp = await bcrypt.hash(Otp , salt);
+      await otp.deleteMany({ phone: req.body.phone });
       const credential = new otp({ phone: req.body.phone, otp: Otp });
       await credential.save().then(async (response) => {
-        await services.sendSms(req.body.phone, unhashedOtp);
+        await services.sendSms(req.body.phone, unhashedOtp).then((response)=>{
+
+        });
         res.status(statusCodes.created).json({
           status: true,
           message: messages.genOtp,
-          data: response
+          data: response,
+          otp: unhashedOtp
         });
       }).catch((err) => {
         const error = err.toString();
@@ -100,37 +104,40 @@ module.exports = {
     }
   },
   verifyOtp: async (req, res) => {
-    console.log(req.body);
-    const response = await otp.find({ phone: req.body.phone });
-    console.log('response is ', response)
-    if (response.length === 0) {
-      res.status(statusCodes.invalid).json({
-        status: false,
-        message: messages.invalidOtp
-      })
-    } else {
-      const validOtp = response[response.length - 1];
-      console.log(validOtp);
-      const isValidUser = await bcrypt.compare(req.body.otp, validOtp.otp);
-      if (validOtp.phone === req.body.phone && isValidUser) {
-        let user = await influencer.find({ phone: validOtp.phone });
+    try {
+      const response = await otp.findOne({ phone: req.body.phone });
+      if (!response) {
+        return res.status(statusCodes.invalid).json({
+          status: false,
+          message: messages.invalidOtp
+        });
+      }
+      const isValidUser = await bcrypt.compare(req.body.otp, response.otp);
+      if (response.phone === req.body.phone && isValidUser) {
+        let user = await influencer.findOne({ phone: response.phone });
         var iid = user.iID
-        console.log('user iss', user[0].iID);
-        const token = await services.generateToken(user);
+        const token = await services.generateToken(user.iID);
         await influencer.updateOne({ phone: req.body.phone }, { token: token });
         await otp.deleteMany({ phone: req.body.phone });
-        res.status(statusCodes.success).json({
+        return res.status(statusCodes.success).json({
           status: true,
           message: messages.loginSuccess,
-          iid: user[0].iID,
+          iid: user.iID,
           token: token
-        })
+        });
       } else {
-        res.status(statusCodes.authorizatiionError).json({
+        return res.status(statusCodes.invalid).json({
           status: false,
-          message: messages.unauthorized
-        })
+          message: messages.invalidOtp
+        });
       }
+    } catch (err) {
+      const error = err.toString();
+      return res.status(statusCodes.internalServerError).json({
+        status: false,
+        message: messages.internalServerError,
+        error: error
+      });
     }
   },
   updateProfile: async (req, res) => {

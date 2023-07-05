@@ -4,11 +4,11 @@ const statusCodes = require("../others/statuscodes/statuscode");
 const messages = require("../others/messages/messages");
 const otpGenerator = require('otp-generators');
 const { merchant } = require("../merchant/common/models/model");
-const {influencer} = require('../influencer/common/models/model')
+const { influencer } = require('../influencer/common/models/model')
 const accountSid = process.env.TWILIO_SID;
 const authToken = process.env.TWILIO_TOKEN;
 const source = process.env.TWILIO_NUMBER;
-const client = require('twilio')(accountSid,authToken);
+const client = require('twilio')(accountSid, authToken);
 
 module.exports = {
   generateToken: async (data) => {
@@ -18,63 +18,63 @@ module.exports = {
     });
   },
 
- verifyUserToken : async (req, res, next) => {
-  try {
+  verifyUserToken: async (req, res, next) => {
+    try {
       const token = req.headers.token;
       if (!token) {
-          res.status(statusCodes.authorizatiionError).json({
-            status : false ,
-              message: messages.unauthorized
-          })
+        res.status(statusCodes.authorizatiionError).json({
+          status: false,
+          message: messages.unauthorized
+        })
       } else {
-          const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-        const response =  await influencer.findOne({phone:decoded.phone});
-        if(response){
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+        const response = await influencer.findOne({ phone: decoded.phone });
+        if (response) {
           next();
-        }else{
+        } else {
           res.status(statusCodes.invalid).json({
-            status : false ,
-            message : messages.expiredOrInvalidToken
+            status: false,
+            message: messages.expiredOrInvalidToken
           });
         }
       }
 
-  } catch (err) {
+    } catch (err) {
       const error = new Error(err)
       error.status = 500
       return next(error)
-  }
-},
-verifyMerchantToken : async (req, res, next) => {
-  try {
+    }
+  },
+  verifyMerchantToken: async (req, res, next) => {
+    try {
       const token = await req.headers.token;
       if (!token) {
-          res.status(statusCodes.authorizatiionError).json({
-            status : false ,
-              message: messages.unauthorized
-          })
+        res.status(statusCodes.authorizatiionError).json({
+          status: false,
+          message: messages.unauthorized
+        })
       } else {
         console.log(process.env.JWT_SECRET_KEY)
         const decoded = await jwt.verify(token, process.env.JWT_SECRET_KEY);
-        console.log("decoded" , decoded);
-        const response =  await merchant.findOne({email:decoded.data.email});
+        console.log("decoded", decoded);
+        const response = await merchant.findOne({ email: decoded.data.email });
         console.log('response', response);
-        if(response){
+        if (response) {
           next();
-        }else{
+        } else {
           res.status(statusCodes.invalid).json({
-            status : false ,
-            message : messages.expiredOrInvalidToken
+            status: false,
+            message: messages.expiredOrInvalidToken
           });
         }
       }
 
-  } catch (err) {
+    } catch (err) {
       const error = new Error(err)
       error.status = 500
       return next(error)
-  }
-},
+    }
+  },
 
 
   validateRequestAndCreate: async (req, res, user) => {
@@ -108,7 +108,7 @@ verifyMerchantToken : async (req, res, next) => {
         });
       });
   },
-  generateOtp : async ()=>{
+  generateOtp: async () => {
     const OTP = otpGenerator.generate(4, {
       alphabets: false,
       upperCase: false,
@@ -116,23 +116,25 @@ verifyMerchantToken : async (req, res, next) => {
     });
     return OTP
   },
-  sendSms : async (number , otp)=>{
-      client.messages.create({
-        body:`Your OTP to login for FIBE is ${otp}`,
-        from: source,
-        to:`+91${number}`
-      }).then((message)=>{
-        console.log(message.status);
-      })
-  } , 
-  getUserById : async (model , id) =>{
+  sendSms: async (number, otp) => {
+    await client.messages.create({
+      body: `Your OTP to login for FIBE is ${otp}`,
+      from: source,
+      to: `+91${number}`
+    }).catch((e) => {
+      return e
+    }).then((message) => {
+      console.log(message.status);
+    })
+  },
+  getUserById: async (model, id) => {
     try {
-      const response = await model.findOne({_id : id});
+      const response = await model.findOne({ _id: id });
       return response
     }
     catch {
       return null
     }
-  } , 
-  
+  },
+
 };
