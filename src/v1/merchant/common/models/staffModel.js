@@ -32,5 +32,5 @@ staffSchema.index({name : 1});
 const Staff = model('Staff', staffSchema , 'staffs');
 
 module.exports = {
-    staff : Staff
+    Staff : Staff
 }

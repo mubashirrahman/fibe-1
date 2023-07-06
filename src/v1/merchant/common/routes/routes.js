@@ -4,6 +4,7 @@ const services = require('../../../services/services')
 const multer = require('multer');
 const brandController = require('../controllers/brandController');
 const campaignController = require('../controllers/campaignController');
+const staffController = require('../controllers/staffController')
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -34,7 +35,7 @@ const upload = multer({
     },
     fileFilter: fileFilter
   });
-router.route('/:id').get(controller.getMerchant);
+router.route('/').get(controller.getMerchant);
 router.route('/signup').post(controller.signUp);
 router.route('/login').post(controller.login);
 router.route('/update').patch(services.verifyMerchantToken ,controller.updateProfile);
@@ -56,7 +57,16 @@ router.route('/campaign/settings').post(campaignController.addCampaignSettings);
 router.route('/campaign').get(campaignController.listCampaign)
 router.route('/campaign/user/').get(campaignController.listCampaignByUser)
 
-router.route('/staff').post(controller.addStaff);
+
+router.post('/staff', staffController.createStaff);
+router.get('/staff', staffController.getAllStaff);
+router.get('/staff/user/', staffController.getStaffByMID);
+router.get('/staff/:id', staffController.getStaffById);
+router.put('/staff/:id', staffController.updateStaffById);
+router.delete('/staff/:id', staffController.deleteStaffById);
+
+module.exports = router;
+
 
 
 router.route('/add/submerchant').post(services.verifyMerchantToken ,controller.addSubMerchant);

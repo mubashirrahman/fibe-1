@@ -32,7 +32,8 @@ const upload = multer({
 
 module.exports = {
   getMerchant: async (req, res) => {
-    const user = await services.getUserById(merchant, req.params.id);
+    console.log(req.query.id)
+    const user = await services.getUserById(merchant, req.query.id);
     if (user != null) {
       try {
         res.status(statusCodes.success).json({
