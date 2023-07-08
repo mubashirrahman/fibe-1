@@ -1,4 +1,5 @@
 const messages = require('../../../others/messages/messages');
+const { merchant } = require('../models/model');
 const { Staff } = require('../models/staffModel');
 
 // Create a new staff member
