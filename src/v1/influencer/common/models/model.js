@@ -64,6 +64,11 @@ const influencerSchema = new Schema({
         default:"Active",
         required:true
     },
+    whatsappStatus: {
+        type: String,
+        default:"not verified",
+        required:true
+    },
     socialLinks: socialSchema
 }, { timestamps: true });
 

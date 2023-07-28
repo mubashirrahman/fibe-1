@@ -14,5 +14,6 @@ router.route('/socialmedia').post(controller.setSocialmedia);
 router.route('/changecity').post(controller.changeCity);
 router.route('/viewcount').post(controller.setViewcount);
 router.route('/setstatus').post(controller.setStatus);
+router.route('/whatsapp').post(controller.verifyWhatsapp);
 
 module.exports = router

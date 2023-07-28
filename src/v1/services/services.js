@@ -47,7 +47,7 @@ module.exports = {
   },
   verifyMerchantToken: async (req, res, next) => {
     try {
-      const token = await req.headers.token;
+      const token = await req.headers.authorization.split(' ')[1];
       if (!token) {
         res.status(statusCodes.authorizatiionError).json({
           status: false,
@@ -57,7 +57,7 @@ module.exports = {
         console.log(process.env.JWT_SECRET_KEY)
         const decoded = await jwt.verify(token, process.env.JWT_SECRET_KEY);
         console.log("decoded", decoded);
-        const response = await merchant.findOne({ email: decoded.data.email });
+        const response = await merchant.findOne({ email: decoded.data});
         console.log('response', response);
         if (response) {
           next();
@@ -109,7 +109,7 @@ module.exports = {
       });
   },
   generateOtp: async () => {
-    const OTP = otpGenerator.generate(4, {
+    const OTP = otpGenerator.generate(6, {
       alphabets: false,
       upperCase: false,
       specialChar: false,

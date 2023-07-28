@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 const statusCodes = require("../../../others/statuscodes/statuscode");
 const messages = require("../../../others/messages/messages");
+const { log } = require('console');
 
 module.exports = {
   listInfluencers: async (req, res) => {
@@ -79,11 +80,11 @@ module.exports = {
       console.log(Otp)
       var unhashedOtp = Otp;
       const salt = await bcrypt.genSalt(10);
-      Otp = await bcrypt.hash(Otp , salt);
+      Otp = await bcrypt.hash(Otp, salt);
       await otp.deleteMany({ phone: req.body.phone });
       const credential = new otp({ phone: req.body.phone, otp: Otp });
       await credential.save().then(async (response) => {
-        await services.sendSms(req.body.phone, unhashedOtp).then((response)=>{
+        await services.sendSms(req.body.phone, unhashedOtp).then((response) => {
 
         });
         res.status(statusCodes.created).json({
@@ -279,7 +280,7 @@ module.exports = {
 
   },
   setStatus: async (req, res) => {
-    const user = await services.getUserById(influencer, req.query.id);
+    const user = await services.getUserById(influencer,req.query.id);
     if (user != null) {
       let status = req.body.status || '';
       await influencer.updateOne({ _id: req.query.id }, { $set: { status: status } }, { runValidators: true }).then((response) => {
@@ -299,8 +300,34 @@ module.exports = {
     } else {
       res.status(statusCodes.notFound).json({
         status: false,
-        message: messages.userNotFound,
+        message: "messages.userNotFound",
       });
+      console.log();
+    }
+  },
+  verifyWhatsapp: async (req, res) => {
+    const user = await services.getUserById(influencer, req.query.id);
+    if (user != null) {
+      let whatsappStatus = req.body.whatsappStatus || '';
+      await influencer.updateOne({ _id: req.query.id }, { $set: { whatsappStatus: whatsappStatus } }, { runValidators: true }).then((response) => {
+        res.status(statusCodes.success).json({
+          status: true,
+          message: messages.updatedSuccessfully,
+          data: response
+        })
+      }).catch((err) => {
+        const error = err.toString();
+        res.status(statusCodes.internalServerError).json({
+          status: false,
+          message: messages.internalServerError,
+          error: error
+        })
+      })
+    } else {
+      res.status(statusCodes.notFound).json({
+        status: false,
+      }
+      );
     }
   }
 };

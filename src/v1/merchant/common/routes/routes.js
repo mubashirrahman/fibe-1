@@ -5,6 +5,7 @@ const multer = require('multer');
 const brandController = require('../controllers/brandController');
 const campaignController = require('../controllers/campaignController');
 const staffController = require('../controllers/staffController')
+const bookingController = require('../controllers/bookingController')
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -35,6 +36,7 @@ const upload = multer({
     },
     fileFilter: fileFilter
   });
+  
 router.route('/').get(controller.getMerchant);
 router.route('/signup').post(controller.signUp);
 router.route('/login').post(controller.login);
@@ -56,6 +58,9 @@ router.route('/campaign/details').post(campaignController.addCampaignDetails);
 router.route('/campaign/settings').post(campaignController.addCampaignSettings);
 router.route('/campaign').get(campaignController.listCampaign)
 router.route('/campaign/user/').get(campaignController.listCampaignByUser)
+router.route('/upcoming-events').get(campaignController.getUpcomingEvents);
+router.route('/previous-events').get(campaignController.getPreviousEvents);
+
 
 
 router.post('/staff', staffController.createStaff);
@@ -64,6 +69,11 @@ router.get('/staff/user/', staffController.getStaffByMID);
 router.get('/staff/:id', staffController.getStaffById);
 router.put('/staff/:id', staffController.updateStaffById);
 router.delete('/staff/:id', staffController.deleteStaffById);
+
+router.post('/book', bookingController.bookInfluencerForCampaign);
+router.get('/influencer/:influencerId/campaigns', bookingController.findCampaignsByInfluencerId);
+router.get('/campaign/:campaignId/influencers', bookingController.findInfluencersByCampaignId);
+router.put('/cancel/:bookingId', bookingController.cancelBooking);
 
 module.exports = router;
 

@@ -151,5 +151,34 @@ module.exports = {
         })
 
 
+    },
+    // API to get upcoming events (campaigns)
+    getUpcomingEvents: async (req, res) => {
+        try {
+            const currentDate = new Date();
+            const upcomingEvents = await campaign.find({
+                'details.startDate': { $gte: currentDate }
+            }).select('-photosAndDescription -settings -mID');
+    
+            res.status(200).json({ events: upcomingEvents });
+        } catch (error) {
+            console.error('Error in getUpcomingEvents:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+    // API to get previous events (campaigns)
+    getPreviousEvents: async (req, res) => {
+        try {
+            const currentDate = new Date();
+            const previousEvents = await campaign.find({
+                'details.endDate': { $lt: currentDate }
+            }).select('-photosAndDescription -settings -mID');
+    
+            res.status(200).json({ events: previousEvents });
+        } catch (error) {
+            console.error('Error in getPreviousEvents:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
     }
+
 }
