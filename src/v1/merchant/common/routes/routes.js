@@ -70,10 +70,10 @@ router.get('/staff/:id', staffController.getStaffById);
 router.put('/staff/:id', staffController.updateStaffById);
 router.delete('/staff/:id', staffController.deleteStaffById);
 
-router.post('/book', bookingController.bookInfluencerForCampaign);
+router.post('/booking', bookingController.bookInfluencerForCampaign);
 router.get('/influencer/:influencerId/campaigns', bookingController.findCampaignsByInfluencerId);
 router.get('/campaign/:campaignId/influencers', bookingController.findInfluencersByCampaignId);
-router.put('/cancel/:bookingId', bookingController.cancelBooking);
+router.put('booking/cancel/:bookingId', bookingController.cancelBooking);
 
 module.exports = router;
 
