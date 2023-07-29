@@ -110,21 +110,43 @@ module.exports = {
             startTime: req.body.startTime,
             endTime: req.body.endTime
         }
-        await campaign.findOneAndUpdate({ _id: req.query.id }, { $set: { details: details } }, { runValidators: true }).then((response) => {
+    
+        // Check if the start date is before tomorrow
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const startDate = new Date(details.startDate);
+        if (startDate < today) {
+            return res.status(statusCodes.badRequest).json({
+                status: false,
+                message: 'Start date must be coming days.'
+            });
+        }
+    
+        // Check if the end date is after the start date
+        const endDate = new Date(details.endDate);
+        if (endDate <= startDate) {
+            return res.status(statusCodes.badRequest).json({
+                status: false,
+                message: 'End date must be after the start date.'
+            });
+        }
+    
+        // Perform the database update
+        try {
+            const response = await campaign.findOneAndUpdate({ _id: req.query.id }, { $set: { details: details } }, { runValidators: true });
             res.status(statusCodes.success).json({
                 status: response ? true : false,
                 data: response,
-                message: response ? messages.updatedSuccessfully : messages.itemNotFount
-            })
-        }).catch((err) => {
+                message: response ? messages.updatedSuccessfully : messages.itemNotFound
+            });
+        } catch (err) {
             const error = err.toString();
             res.status(statusCodes.internalServerError).json({
                 status: false,
                 message: messages.internalServerError,
                 error: error
-            })
-        })
-
+            });
+        }
     },
     addCampaignSettings: async (req, res) => {
 

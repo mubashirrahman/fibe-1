@@ -50,7 +50,7 @@ const getStaffById = (req, res) => {
 // Get a specific staff member by mID
 const getStaffByMID = (req, res) => {
     console.log(req.query.mID);
-    Staff.findOne({ mID: req.query.mID })
+    Staff.find({ mID: req.query.mID })
         .then((staff) => {
             if (!staff) {
                 return res.status(404).json({ message: messages.itemNotFount });
