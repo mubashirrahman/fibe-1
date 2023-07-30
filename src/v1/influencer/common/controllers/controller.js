@@ -124,6 +124,7 @@ module.exports = {
           status: true,
           message: messages.loginSuccess,
           iid: user.iID,
+          _id: user._id,
           token: token
         });
       } else {
