@@ -46,6 +46,8 @@ router.route('/delete').delete(services.verifyMerchantToken ,controller.deleteAc
 
 
 router.route('/brand/basic').post(upload.fields([{ name: 'logo', maxCount: 1 }]),brandController.addBasicBrand);
+router.route('/brand/basic').put(upload.fields([{ name: 'logo', maxCount: 1 }]),brandController.updateBasicBrand);
+router.route('/brand/').delete(brandController.deleteBrand);
 router.route('/brand/branch/').post(brandController.addBrandBranch);
 router.route('/brand/description').post(upload.fields([{ name: 'file', maxCount: 1 }]),brandController.addBrandDesc);
 router.route('/brands').get(brandController.listBrands)
@@ -53,6 +55,8 @@ router.route('/brands/user/').get(brandController.listBrandsByUser)
 
 router.route('/add/campaign').post(services.verifyMerchantToken ,upload.fields([{ name: 'campaignImages', maxCount: 4 }, { name: 'coverImage', maxCount: 1 }]),controller.addCampaign);
 router.route('/campaign/basic').post(campaignController.addBasicCampaign);
+router.route('/campaign/basic').put(campaignController.updateBasicCampaign);
+router.route('/campaign/').delete(campaignController.deleteCampaign);
 router.route('/campaign/photoDescription').post(upload.fields([{ name: 'campaignImages', maxCount: 4 }, { name: 'coverImage', maxCount: 1 }]),campaignController.addCampaignPhotoDesc);
 router.route('/campaign/details').post(campaignController.addCampaignDetails);
 router.route('/campaign/settings').post(campaignController.addCampaignSettings);
@@ -60,6 +64,7 @@ router.route('/campaign').get(campaignController.listCampaign)
 router.route('/campaign/user/').get(campaignController.listCampaignByUser)
 router.route('/upcoming-events').get(campaignController.getUpcomingEvents);
 router.route('/previous-events').get(campaignController.getPreviousEvents);
+router.route('/event-completed/:merchantId').get(campaignController.completedCamapign)
 
 
 
@@ -73,7 +78,7 @@ router.delete('/staff/:id', staffController.deleteStaffById);
 router.post('/booking', bookingController.bookInfluencerForCampaign);
 router.get('/influencer/:influencerId/campaigns', bookingController.findCampaignsByInfluencerId);
 router.get('/campaign/:campaignId/influencers', bookingController.findInfluencersByCampaignId);
-router.put('booking/cancel/:bookingId', bookingController.cancelBooking);
+router.put('/booking/cancel/:bookingId', bookingController.cancelBooking);
 
 module.exports = router;
 

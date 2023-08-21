@@ -58,7 +58,68 @@ module.exports = {
         })
         await services.validateRequestAndCreate(req, res, Brand);
     },
+    // Update Basic Brand API
+    updateBasicBrand: async (req, res) => {
+        const { brandName, instagram, orderLink, deliveryZone } = req.body;
+        const { brandId } = req.query; // Assuming you get the brandId from the URL params
 
+        try {
+            // Check if the brand exists in the database
+            const existingBrand = await brand.findById(brandId);
+            if (!existingBrand) {
+                return res.status(404).json({ error: 'Brand not found' });
+            }
+
+            // Update the basic information fields if they are provided in the request
+            if (brandName) {
+                existingBrand.basic_Information.brandName = brandName;
+            }
+            if (instagram) {
+                existingBrand.basic_Information.instagram = instagram;
+            }
+            if (orderLink) {
+                existingBrand.basic_Information.orderLink = orderLink;
+            }
+            if (deliveryZone) {
+                existingBrand.basic_Information.deliveryZone = deliveryZone;
+            }
+
+            // Check if the request contains the 'logo' file and update it if needed
+            if (req.files && req.files.logo) {
+                existingBrand.basic_Information.logo = req.files.logo[0].path;
+            }
+
+            // Save the updated brand information
+            await existingBrand.save();
+
+            // Respond with the updated brand object
+            res.json(existingBrand);
+        } catch (error) {
+            console.error('Error updating brand:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    },
+    // Delete Brand API
+    deleteBrand: async (req, res) => {
+        const { brandId } = req.query; // Assuming you get the brandId from the URL params
+
+        try {
+            // Check if the brand exists in the database
+            const existingBrand = await brand.findById(brandId);
+            if (!existingBrand) {
+                return res.status(404).json({ error: 'Brand not found' });
+            }
+
+            // Delete the brand from the database
+            await existingBrand.deleteOne()
+
+            // Respond with a success message
+            res.json({ message: 'Brand deleted successfully' });
+        } catch (error) {
+            console.error('Error deleting brand:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    },
     addBrandBranch: async (req, res) => {
         const branch_Information = {
             branchName: req.body.branchName,
