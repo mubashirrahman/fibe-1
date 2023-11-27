@@ -5,7 +5,16 @@ const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 const statusCodes = require("../../../others/statuscodes/statuscode");
 const messages = require("../../../others/messages/messages");
-const { log } = require('console');
+const { log, Console } = require('console');
+const AWS = require('aws-sdk');
+
+const spacesEndpoint = new AWS.Endpoint('https://fra1.digitaloceanspaces.com');
+const s3 = new AWS.S3({
+  endpoint: spacesEndpoint,
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_KEY,
+});
+
 
 module.exports = {
   listInfluencers: async (req, res) => {
@@ -65,8 +74,86 @@ module.exports = {
     }
   },
 
+  addProfilePicture: async (req, res) => {
+    if (!req.files || !req.files.profile) {
+      return
+    }
+    const file = req.files.profile[0];
+    if (!file.mimetype.startsWith('image/')) {
+      return res.status(400).send('Invalid file type. Please upload an image.');
+    }
+    const user = await services.getUserById(influencer, req.query.id);
+    if (!user) {
+      return res.status(statusCodes.notFound).json({
+        status: false,
+        message: messages.userNotFound,
+      })
+    }
+    const params = {
+      Bucket: 'fibes-store',
+      Key: `profile-pictures/${Date.now()}-${file.originalname}`,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+      ACL: 'public-read'
+    };
 
+    try {
+      const data = await s3.upload(params).promise();
+      const fileUrl = data.Location;
+      const fileName = data.key;
 
+      // res.send(`File uploaded successfully. URL: ${fileUrl}`);
+      await influencer.updateOne(
+        { _id: req.query.id },
+        { $set: { profilePicture: fileName } },
+        { runValidators: true }
+      );
+
+      res.send(`File uploaded successfully. URL: ${fileUrl}`);
+    } catch (error) {
+      console.error('Error uploading file to DigitalOcean Space:', error);
+      res.status(500).send('Internal Server Error');
+    }
+
+  },
+  deleteProfilePicture: async (req, res) => {
+    const { key } = req.query;
+    if (!key) {
+      return res.status(400).json({ error: 'Image key is required.' });
+    }
+
+    const params = {
+      Bucket: 'fibes-store',
+      Key: key,
+    };
+
+    try {
+      // Check if the object (image) exists
+      // If no error is thrown, the object exists, proceed to delete
+      await s3.headObject(params).promise();
+      await s3.deleteObject(params).promise();
+      const updatedInfluencer = await influencer.findOneAndUpdate(
+        { profilePicture:key},
+        { $unset: { profilePicture: 1 } },
+        { new: true }
+      );
+      if (!updatedInfluencer) {
+        console.log('Influencer not found for the given profilePicture:', key);
+        return res.status(404).json({ error: 'Influencer not found.' });
+      }
+      res.json({ message: 'Image deleted successfully.' });
+    } catch (error) {
+      // Check status code to determine the nature of the error
+      // 404 indicates the object was not found
+      if (error.statusCode === 404) {
+        console.log('Image not found:', key);
+        res.status(404).json({ error: 'Image not found.' });
+      } else {
+        console.error('Error deleting image:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+    }
+  },
   generateOtp: async (req, res) => {
     const user = await influencer.findOne({
       phone: req.body.phone,
@@ -281,7 +368,7 @@ module.exports = {
 
   },
   setStatus: async (req, res) => {
-    const user = await services.getUserById(influencer,req.query.id);
+    const user = await services.getUserById(influencer, req.query.id);
     if (user != null) {
       let status = req.body.status || '';
       await influencer.updateOne({ _id: req.query.id }, { $set: { status: status } }, { runValidators: true }).then((response) => {
@@ -327,6 +414,7 @@ module.exports = {
     } else {
       res.status(statusCodes.notFound).json({
         status: false,
+        messages: messages.userNotFound
       }
       );
     }

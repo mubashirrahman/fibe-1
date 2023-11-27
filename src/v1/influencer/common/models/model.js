@@ -69,6 +69,9 @@ const influencerSchema = new Schema({
         default:"not verified",
         required:true
     },
+    profilePicture : {
+        type: String,
+    },
     socialLinks: socialSchema
 }, { timestamps: true });
 
