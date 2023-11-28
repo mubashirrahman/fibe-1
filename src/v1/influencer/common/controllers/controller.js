@@ -76,7 +76,7 @@ module.exports = {
 
   addProfilePicture: async (req, res) => {
     if (!req.files || !req.files.profile) {
-      return
+      return res.status(400).send('Please upload an image.');
     }
     const file = req.files.profile[0];
     if (!file.mimetype.startsWith('image/')) {
