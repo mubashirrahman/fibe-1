@@ -117,16 +117,16 @@ module.exports = {
     return OTP
   },
   sendSms: async (number, otp) => {
-    await client.messages.create({
-      body: `Your OTP to login for FIBE is ${otp}`,
-      from: source,
-      to: `+91${number}`
-    }).catch((e) => {
-      return e
-    }).then((message) => {
-      console.log(message.status);
-    })
+    client.messages
+      .create({
+        body: `the fibe verification code is ${otp}`,
+        from: `${source}`,
+        to: `+${number}`
+      }, { timeout: 10000 }) // 10 seconds timeout
+      .then(message => console.log(message.sid))
+      .catch(error => console.error(`Error sending message: ${error.message}`));
   },
+
   getUserById: async (model, id) => {
     try {
       const response = await model.findOne({ _id: id });
